@@ -9,27 +9,34 @@ import {
 import Cookies from 'js-cookie'
 // import Cookies from 'js-cookie'
 
-class Login extends React.Component {
+class Register extends React.Component {
     constructor(props) {
         super(props)
         this.state = {
             error: false,
             isValidUser: 0,
+            in_submit: false,
             errorMsg: CONSTANTS.MESSAGE.UNEXPECTED_ERROR
         }
     }
 
-    onLoginHandle(event) {
+    onRegisterHandle(event) {
         event.preventDefault();
-        const user = event.target.user.value;
+        const email = event.target.email.value;
         const pass = event.target.pass.value;
-        if ((user && user !== undefined) && (pass && pass !== undefined)) { // Check if valid data input
+
+        this.setState({
+            isValidUser: 0,
+            in_submit: true
+        })
+
+        if ((email && email !== undefined) && (pass && pass !== undefined)) { // Check if valid data input
             // Register data record
             $.ajax({
                 url: "/api/register",
                 type: "POST",
                 data: JSON.stringify({
-                    user: user,
+                    email: email,
                     pass: pass
                 }),
                 contentType: 'application/json',
@@ -37,7 +44,19 @@ class Login extends React.Component {
             })
             .then(
                 (result) => {
-                    console.log(result);
+                    if (!result.error) {
+                        // Sucess registered
+                        Cookies.set("email", email);
+                        // Reload page
+                        window.location.href = "/";
+                    } else {
+                        // Incorrect / Invalid Credential
+                        this.setState({
+                            isValidUser: false,
+                            in_submit: false,
+                            errorMsg: CONSTANTS.MESSAGE.UNEXPECTED_ERROR
+                        })
+                    }
                 },
                 // Note: it's important to handle errors here
                 // instead of a catch() block so that we don't swallow
@@ -46,6 +65,7 @@ class Login extends React.Component {
                     this.setState({
                         error: true,
                         isValidUser: false,
+                        in_submit: false,
                         errorMsg: CONSTANTS.MESSAGE.UNEXPECTED_ERROR
                     })
                         
@@ -57,6 +77,7 @@ class Login extends React.Component {
                     this.setState({
                         error: true,
                         isValidUser: false,
+                        in_submit: false,
                         errorMsg: CONSTANTS.MESSAGE.UNEXPECTED_ERROR
                     })
                         
@@ -74,8 +95,28 @@ class Login extends React.Component {
         })
     }
 
+    // Render Submit Button Element
+    renderSubmitElement(){
+        if ( this.state.in_submit ) {
+            // Already clicked the submit button
+            return (
+                <button className="btn btn-default waves-effect waves-light disabled">
+                    <MDBIcon icon="spinner" className="fa-spin mr-2" />
+                    {CONSTANTS.MESSAGE.LOADING}
+                </button>
+            )
+        } else {
+            // Onload element display
+            return (
+                <button className="btn btn-default waves-effect waves-light">
+                    {CONSTANTS.MESSAGE.SIGNUP}
+                </button>
+            )
+        }
+    }
+
     render() {
-        document.title = CONSTANTS.MESSAGE.SINGIN_TITLE;
+        document.title = CONSTANTS.MESSAGE.SINGUP_TITLE;
         return (
             <React.Fragment>
                 <MDBContainer className="h-50vh">
@@ -85,12 +126,12 @@ class Login extends React.Component {
                                 <MDBCardBody className="black-text">
                                     <MDBCardTitle className="font-weight-bold font-family-architects-daughter text-center">{CONSTANTS.MESSAGE.REGISTER}</MDBCardTitle>
                                     <MDBBox tag="div">
-                                        <form onSubmit={this.onLoginHandle.bind(this)}>
+                                        <form onSubmit={this.onRegisterHandle.bind(this)}>
                                             <MDBBox tag="div" className="grey-text">
                                                 <MDBInput
                                                     onChange={this.onInputChangeHandle.bind(this)}
                                                     label={CONSTANTS.MESSAGE.EMAIL}
-                                                    name="user"
+                                                    name="email"
                                                     icon="user"
                                                     type="email"
                                                     group required
@@ -108,7 +149,7 @@ class Login extends React.Component {
                                                 <MDBBox tag="div" className={this.state.isValidUser === 0 ? "d-none" : this.state.isValidUser ? "d-none" : "invalid-feedback mt-1rem-neg mb-2 d-block"}>{this.state.errorMsg}</MDBBox>
                                             </MDBBox>
                                             <MDBBox tag="div" className="text-center">
-                                                <button className="btn btn-default waves-effect waves-light">{CONSTANTS.MESSAGE.SIGNUP}</button>
+                                                {this.renderSubmitElement()}
                                             </MDBBox>
                                         </form>
                                     </MDBBox>
@@ -127,4 +168,4 @@ class Login extends React.Component {
     }
 }
 
-export default Login
+export default Register

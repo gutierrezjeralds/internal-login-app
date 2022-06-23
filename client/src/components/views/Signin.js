@@ -4,7 +4,7 @@ import $ from 'jquery';
 import { CONSTANTS } from '../Constants';
 import {
     MDBContainer, MDBRow, MDBCol, MDBInput, MDBBox,
-    MDBCard, MDBCardBody, MDBCardTitle, MDBCardFooter, MDBCardText
+    MDBCard, MDBCardBody, MDBCardTitle, MDBCardFooter, MDBCardText, MDBBtn, MDBIcon
 } from 'mdbreact';
 import Cookies from 'js-cookie'
 // import Cookies from 'js-cookie'
@@ -15,32 +15,59 @@ class Login extends React.Component {
         this.state = {
             error: false,
             isValidUser: 0,
+            in_submit: false,
             errorMsg: CONSTANTS.MESSAGE.UNEXPECTED_ERROR
         }
     }
 
     onLoginHandle(event) {
         event.preventDefault();
-        const user = event.target.user.value;
+        const email = event.target.email.value;
         const pass = event.target.pass.value;
-        if ((user && user !== undefined) && (pass && pass !== undefined)) { // Check if valid data input
+
+        this.setState({
+            isValidUser: 0,
+            in_submit: true
+        })
+
+        if ((email && email !== undefined) && (pass && pass !== undefined)) { // Check if valid data input
             // Get Record Data from table / json x used POST Method to prevent the display of credential in URI
+            const datas = { // Setting up the data json
+                email: email.toUpperCase(),
+                pass: pass
+            }
+
             $.ajax({
                 url: "/api/login",
                 type: "POST",
-                data: JSON.stringify({
-                    user: user,
-                    pass: pass
-                }),
+                data: JSON.stringify(datas),
                 contentType: 'application/json',
                 cache: false,
             })
             .then(
                 (result) => {
-                    console.log(result);
-                    Cookies.set("user", user);
-                    // Reload page
-                    window.location.href = "/";
+                    if (!result.error) {
+                        if (result.data.length > 0) {
+                            // Sucess credential
+                            Cookies.set("email", email);
+                            // Reload page
+                            window.location.href = "/";
+                        } else {
+                            // Incorrect / Invalid Credential
+                            this.setState({
+                                isValidUser: false,
+                                in_submit: false,
+                                errorMsg: CONSTANTS.MESSAGE.INVALID_CREDENTIAL
+                            })
+                        }
+                    } else {
+                        // Incorrect / Invalid Credential
+                        this.setState({
+                            isValidUser: false,
+                            in_submit: false,
+                            errorMsg: CONSTANTS.MESSAGE.INVALID_CREDENTIAL
+                        })
+                    }
                 },
                 // Note: it's important to handle errors here
                 // instead of a catch() block so that we don't swallow
@@ -49,6 +76,7 @@ class Login extends React.Component {
                     this.setState({
                         error: true,
                         isValidUser: false,
+                        in_submit: false,
                         errorMsg: CONSTANTS.MESSAGE.UNEXPECTED_ERROR
                     })
                         
@@ -60,6 +88,7 @@ class Login extends React.Component {
                     this.setState({
                         error: true,
                         isValidUser: false,
+                        in_submit: false,
                         errorMsg: CONSTANTS.MESSAGE.UNEXPECTED_ERROR
                     })
                         
@@ -75,6 +104,26 @@ class Login extends React.Component {
         this.setState({
             isValidUser: 0
         })
+    }
+
+    // Render Submit Button Element
+    renderSubmitElement(){
+        if ( this.state.in_submit ) {
+            // Already clicked the submit button
+            return (
+                <button className="btn btn-default waves-effect waves-light disabled">
+                    <MDBIcon icon="spinner" className="fa-spin mr-2" />
+                    {CONSTANTS.MESSAGE.LOADING}
+                </button>
+            )
+        } else {
+            // Onload element display
+            return (
+                <button className="btn btn-default waves-effect waves-light">
+                    {CONSTANTS.MESSAGE.SIGNIN}
+                </button>
+            )
+        }
     }
 
     render() {
@@ -93,7 +142,7 @@ class Login extends React.Component {
                                                 <MDBInput
                                                     onChange={this.onInputChangeHandle.bind(this)}
                                                     label={CONSTANTS.MESSAGE.EMAIL}
-                                                    name="user"
+                                                    name="email"
                                                     icon="user"
                                                     type="email"
                                                     group required
@@ -111,7 +160,7 @@ class Login extends React.Component {
                                                 <MDBBox tag="div" className={this.state.isValidUser === 0 ? "d-none" : this.state.isValidUser ? "d-none" : "invalid-feedback mt-1rem-neg mb-2 d-block"}>{this.state.errorMsg}</MDBBox>
                                             </MDBBox>
                                             <MDBBox tag="div" className="text-center">
-                                                <button className="btn btn-default waves-effect waves-light">{CONSTANTS.MESSAGE.SIGNIN}</button>
+                                                {this.renderSubmitElement()}
                                             </MDBBox>
                                         </form>
                                     </MDBBox>

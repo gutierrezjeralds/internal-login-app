@@ -17,7 +17,8 @@ const MESSAGE = {
     NOTMEMBER: "Not a Member?",
     ALREADYHAVE_ACCTOUNT: "Already have an account?",
     HELLO: "Hello,",
-    WORLD: "world!"
+    WORLD: "world!",
+    LOADING: "Loading"
 }
 
 export const CONSTANTS = {

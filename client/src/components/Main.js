@@ -12,7 +12,7 @@ class Main extends React.Component {
     constructor(props) {
         super(props)
         this.state = {
-            promptUser: Cookies.get("user")
+            promptUser: Cookies.get("email")
         }
     }
 

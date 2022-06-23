@@ -22,7 +22,7 @@ class Home extends React.Component {
     onLogoutHandle(event) {
         event.preventDefault();
         // Logout x removed cookie
-        Cookies.set('user', '');
+        Cookies.set('email', '');
         // Reload page
         window.location.reload();
     }

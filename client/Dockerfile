@@ -10,4 +10,4 @@ COPY . .
 
 EXPOSE 3001
 
-CMD [ "nmp", "start" ]
+CMD [ "npm", "start" ]
