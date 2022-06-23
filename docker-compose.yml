@@ -1,0 +1,45 @@
+version: "3"
+services:
+  react-app:
+    image: react-app
+    stdin_open: true
+    ports: 
+      - "3000:3000"
+    networks:
+      - internal-app
+  api-server:
+    image: api-server
+    ports:
+      - "3001:3001"
+    networks:
+      - internal-app
+    depends_on:
+      - mysql
+  mysql:
+    image: mysql:5.7
+    ports:
+      - "27017:27017"
+    networks:
+      - internal-app
+    environment:
+      - MYSQL_HOST=jsg-mysql-app
+      - MYSQL_USER=jsguser
+      - MYSQL_PASS=jsgroot
+      - MYSQL_DB=jsg_db
+    volumes:
+      - mysql-data:/data/db
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin:4.7
+    depends_on:
+      - mysql
+    ports:
+      - 3002:3002
+    environment:
+      - PMA_HOST=jsg-mysql-app
+      - PMA_PORT=3002
+networks:
+  mern-app:
+    driver: bridge
+volumes:
+  mysql-data:
+    driver: local
