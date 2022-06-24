@@ -7,6 +7,7 @@ const MESSAGE = {
     UNEXPECTED_ERROR: "Unexpected error, please reload the page!",
     ERROR_OCCURED: "Oh well, you failed. Here some thoughts on the error that occured:",
     INVALID_CREDENTIAL: "Invalid credential. Please try again.",
+    DUPLICATE_RECORD: "Duplicate record. Please try again.",
     SIGNIN: "Sign In",
     LOGIN: "Login",
     SIGNUP: "Sign Up",
@@ -18,7 +19,8 @@ const MESSAGE = {
     ALREADYHAVE_ACCTOUNT: "Already have an account?",
     HELLO: "Hello,",
     WORLD: "world!",
-    LOADING: "Loading"
+    LOADING: "Loading",
+    PLEASEWAIT: "Please wait!"
 }
 
 export const CONSTANTS = {

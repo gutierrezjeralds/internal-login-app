@@ -4,9 +4,11 @@ import $ from 'jquery';
 import { CONSTANTS } from '../Constants';
 import {
     MDBContainer, MDBRow, MDBCol, MDBInput, MDBBox,
-    MDBCard, MDBCardBody, MDBCardTitle, MDBCardFooter, MDBCardText, MDBBtn, MDBIcon
+    MDBCard, MDBCardBody, MDBCardTitle, MDBCardFooter, MDBCardText, MDBIcon
 } from 'mdbreact';
 import Cookies from 'js-cookie'
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 // import Cookies from 'js-cookie'
 
 class Login extends React.Component {
@@ -36,6 +38,17 @@ class Login extends React.Component {
                 email: email.toUpperCase(),
                 pass: pass
             }
+
+            // Notification x due to slow db connection in server
+            toast.info(CONSTANTS.MESSAGE.PLEASEWAIT, {
+                position: "top-right",
+                autoClose: 3000,
+                hideProgressBar: true,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined
+            });
 
             $.ajax({
                 url: "/api/login",
@@ -174,6 +187,7 @@ class Login extends React.Component {
                         </MDBCol>
                     </MDBRow>
                 </MDBContainer>
+                <ToastContainer />
             </React.Fragment>
         )
     }

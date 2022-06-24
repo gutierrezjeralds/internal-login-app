@@ -4,9 +4,11 @@ import $ from 'jquery';
 import { CONSTANTS } from '../Constants';
 import {
     MDBContainer, MDBRow, MDBCol, MDBInput, MDBBox,
-    MDBCard, MDBCardBody, MDBCardTitle, MDBCardFooter, MDBCardText
+    MDBCard, MDBCardBody, MDBCardTitle, MDBCardFooter, MDBCardText, MDBIcon
 } from 'mdbreact';
 import Cookies from 'js-cookie'
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 // import Cookies from 'js-cookie'
 
 class Register extends React.Component {
@@ -31,6 +33,18 @@ class Register extends React.Component {
         })
 
         if ((email && email !== undefined) && (pass && pass !== undefined)) { // Check if valid data input
+            // Notification x due to slow db connection in server
+            toast.info(CONSTANTS.MESSAGE.PLEASEWAIT, {
+                position: "top-right",
+                autoClose: 3000,
+                hideProgressBar: true,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined
+            });
+
+
             // Register data record
             $.ajax({
                 url: "/api/register",
@@ -68,6 +82,11 @@ class Register extends React.Component {
                         in_submit: false,
                         errorMsg: CONSTANTS.MESSAGE.UNEXPECTED_ERROR
                     })
+
+                    if (error.responseJSON !== undefined && error.responseJSON.data === "ER_DUP_ENTRY") {
+                        // Duplicate record
+                        this.setState({errorMsg: CONSTANTS.MESSAGE.DUPLICATE_RECORD})
+                    }
                         
                     console.error(CONSTANTS.MESSAGE.ERROR_OCCURED, error)
                 }
@@ -163,6 +182,7 @@ class Register extends React.Component {
                         </MDBCol>
                     </MDBRow>
                 </MDBContainer>
+                <ToastContainer />
             </React.Fragment>
         )
     }

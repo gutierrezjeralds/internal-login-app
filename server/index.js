@@ -90,10 +90,19 @@ app.post("/api/register", async (req, res) => {
         // End Connection
         dbConn.end();
         if (error) {
+          if (error.code !== undefined && error.code === "ER_DUP_ENTRY") {
+            // Duplicate record
+            return res.type("application/json").status(400).send({
+              error: false,
+              data: "ER_DUP_ENTRY"
+            });
+          } else {
+            // Error in query
             return res.type("application/json").status(500).send({
                 error: true,
                 data: error
             });
+          }
         } else {
             return res.type("application/json").status(200).send({
                 error: false,
